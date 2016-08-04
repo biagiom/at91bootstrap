@@ -87,6 +87,7 @@ typedef struct board_hw_info {
 
 static unsigned int sn;
 static unsigned int rev;
+#if !defined(CONFIG_AT91SAM9X5_ARIETTA) && !defined(CONFIG_AT91SAM9X5_ARIA)
 static unsigned char buffer[HW_INFO_TOTAL_SIZE];
 
 static struct {
@@ -335,6 +336,7 @@ static int get_board_hw_info(unsigned char *buff,
 
 	return 0;
 }
+#endif
 
 /*******************************************************************************
  * SN layout
@@ -379,6 +381,7 @@ static int get_board_hw_info(unsigned char *buff,
 #define DM_REV_ID_OFFSET	18
 #define EK_REV_ID_OFFSET	21
 
+#if !defined(CONFIG_AT91SAM9X5_ARIETTA) && !defined(CONFIG_AT91SAM9X5_ARIA)
 static int construct_sn_rev(board_info_t *bd_info,
 			    unsigned int *psn,
 			    unsigned int *prev)
@@ -423,6 +426,7 @@ static int construct_sn_rev(board_info_t *bd_info,
 
 	return ret;
 }
+#endif
 
 static unsigned int set_default_sn(void)
 {
@@ -446,6 +450,24 @@ static unsigned int set_default_sn(void)
 	vendor_dm = VENDOR_FLEX;
 	vendor_ek = VENDOR_FLEX;
 
+#elif defined(CONFIG_AT91SAM9X5_ARIETTA)
+	/* at91sam9x5_arietta
+	 * CPU Module: AT91SAM9G25, ATMEL
+	 * EK Module: SAM9x5-EK, ACME SYSTEMS
+	 */
+	board_id_cm = BOARD_ID_SAM9X25_CM;
+	board_id_ek = BOARD_ID_ARIETTAG25;
+	vendor_cm = VENDOR_ATMEL_RFO;
+	vendor_ek = VENDOR_ACME;
+#elif defined(CONFIG_AT91SAM9X5_ARIA)
+	/* at91sam9x5_aria
+	 * CPU Module: AT91SAM9G25, ATMEL
+	 * EK Module: SAM9x5-EK, ACME SYSTEMS
+	 */
+	board_id_cm = BOARD_ID_SAM9X25_CM;
+	board_id_ek = BOARD_ID_ARIETTAG25;
+	vendor_cm = VENDOR_ATMEL_RFO;
+	vendor_ek = VENDOR_ACME;
 #elif defined(CONFIG_SAMA5D3XEK) || defined(CONFIG_SAMA5D3X_CMP)
 
 	/* sama5d3xek
@@ -506,6 +528,30 @@ static unsigned int set_default_rev(void)
 	rev_id_dm = '0';
 	rev_id_ek = '0';
 
+#elif defined(CONFIG_AT91SAM9X5_ARIETTA)
+	/* at91sam9x5_arietta
+	 * CPU Module: 'B', '1'
+	 * Display Module: 'A', '0'
+	 * EK Module: 'B','1'
+	 */
+	rev_cm = 'B';
+	rev_dm = 'A';
+	rev_ek = 'B';
+	rev_id_cm = '1';
+	rev_id_dm = '0';
+	rev_id_ek = '1';
+#elif defined(CONFIG_AT91SAM9X5_ARIA)
+	/* at91sam9x5_aria
+	 * CPU Module: 'B', '1'
+	 * Display Module: 'A', '0'
+	 * EK Module: 'B','1'
+	 */
+	rev_cm = 'B';
+	rev_dm = 'A';
+	rev_ek = 'B';
+	rev_id_cm = '1';
+	rev_id_dm = '0';
+	rev_id_ek = '1';
 #elif defined(CONFIG_SAMA5D3XEK) || defined(CONFIG_SAMA5D3X_CMP)
 
 	/* sama5d3xek
@@ -591,7 +637,7 @@ unsigned int get_ek_sn(void)
 	return (sn  >> EK_SN_OFFSET) & SN_MASK;
 }
 
-#if defined(CONFIG_LOAD_ONE_WIRE)
+#if (defined(CONFIG_LOAD_ONE_WIRE) && !defined(CONFIG_AT91SAM9X5_ARIETTA) && !defined(CONFIG_AT91SAM9X5_ARIA))
 static int load_1wire_info(unsigned char *buff, unsigned int size,
 			   unsigned int *psn, unsigned int *prev)
 {
@@ -669,15 +715,21 @@ static int load_eeprom_info(unsigned char *buff, unsigned int size,
 
 void load_board_hw_info(void)
 {
-	unsigned int size = HW_INFO_TOTAL_SIZE;
 	int ret;
+#if defined(CONFIG_AT91SAM9X5_ARIETTA) || defined(CONFIG_AT91SAM9X5_ARIA)
+	ret = 1;
+
+#else
+	unsigned int size = HW_INFO_TOTAL_SIZE;
 
 #if defined(CONFIG_LOAD_ONE_WIRE)
 	ret = load_1wire_info(buffer, size, &sn, &rev);
-#endif
+#endif  /* #if defined(CONFIG_LOAD_ONE_WIRE) */
 #if defined(CONFIG_LOAD_EEPROM)
 	ret = load_eeprom_info(buffer, size, 0, &sn, &rev);
-#endif
+#endif /* #if defined(CONFIG_LOAD_EEPROM) */
+
+#endif /* #if defined(CONFIG_AT91SAM9X5_ARIETTA) || defined(CONFIG_AT91SAM9X5_ARIA) */
 	if (ret) {
 #if defined(CONFIG_LOAD_ONE_WIRE)
 		dbg_info("\n1-Wire: ");
