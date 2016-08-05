@@ -83,6 +83,14 @@ config CONFIG_OF_ADDRESS
 	default "0x21000000"
 	help
 
+config CONFIG_MULTICON_DTS
+	bool "Flattened Device Tree support for Acqua Multicon Touch"
+	depends on CONFIG_SAMA5D3_ACQUA && CONFIG_OF_LIBFDT && CONFIG_SDCARD && CONFIG_RAM_256MB
+	default n
+	help
+		Add support for the Device Tree Source file of Acqua-A5 evaluation kit 
+		with TFT LCD and WIFI-2 module
+
 endmenu
 
 endmenu

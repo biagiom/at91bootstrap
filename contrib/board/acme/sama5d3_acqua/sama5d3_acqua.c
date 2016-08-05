@@ -458,9 +458,13 @@ void at91_spi0_hw_init(void)
 #ifdef CONFIG_OF_LIBFDT
 void at91_board_set_dtb_name(char *of_name)
 {
-	strcat(of_name, "at91-sama5d3_acqua.dtb");
+#ifdef CONFIG_MULTICON_FDT
+	strcat(of_name, "acme-acqua-multicon.dtb");
+#else
+ 	strcat(of_name, "at91-sama5d3_acqua.dtb");
+#endif /* #ifdef CONFIG_MULTICON_FDT */
 }
-#endif
+#endif /* #ifdef CONFIG_OF_LIBFDT */
 
 void at91_mci0_hw_init(void)
 {
