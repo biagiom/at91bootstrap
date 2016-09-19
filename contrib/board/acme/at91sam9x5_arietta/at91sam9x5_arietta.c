@@ -237,7 +237,7 @@ void at91_spi0_hw_init(void)
 #ifdef CONFIG_OF_LIBFDT
 void at91_board_set_dtb_name(char *of_name)
 {
-	strcpy(of_name, "acme-arietta");
+	strcpy(of_name, "at91-ariettag25");
 	strcat(of_name, ".dtb");
 }
 #endif
